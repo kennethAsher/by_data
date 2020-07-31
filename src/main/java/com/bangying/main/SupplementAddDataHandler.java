@@ -1,6 +1,6 @@
 package com.bangying.main;
 
-/**
+/*
  * ClassName:       SupplementAddData
  * Package:         main
  * Datetime:        2020/7/27   3:39 下午
@@ -11,13 +11,11 @@ package com.bangying.main;
 
 import com.bangying.cleandata.SupplementAddData;
 import com.bangying.utils.Constant;
-import com.bangying.utils.HdfsUtils;
 import com.bangying.utils.SparkUtils;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.spark.api.java.JavaSparkContext;
 
 import java.io.IOException;
 
