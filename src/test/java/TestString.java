@@ -8,7 +8,12 @@
  */
 public class TestString {
     public static void main(String[] args) {
-        String line = "this is ok, %s is good";
-        System.out.println(String.format(line, "k哥"));
+//        测试句子中添加标题
+        String line = "I am LiLei, do you have friend?";
+        System.out.println(line.substring(0,line.indexOf("do")));
+//        System.out.println(String.format(line, "k哥"));
+
+//        String[] lines = "zhangsan lisi wangmazi liuwu".split(" ");
+//        System.out.println(lines.length);
     }
 }

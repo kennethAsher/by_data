@@ -10,14 +10,37 @@
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 public class TestPattern {
     public static void main(String[] args) {
-        Logger logger = LoggerFactory.getLogger(TestPattern.class.getName());
-        Pattern pattern = Pattern.compile("NULL|\\+|,|-|\\.|0|1|2|3|4|5|6|7|8|9|>|\\?|null|VF|_|`|·|ˎ̥|‘|、|【");
-        String line = "NULL河北理工法院";
-        String[] court = pattern.split(line);
-        System.out.println(court[court.length - 1]);
-//        logger.info("正在输出"+court);
+//        Logger logger = LoggerFactory.getLogger(TestPattern.class.getName());
+//        Pattern pattern = Pattern.compile("[,，]");
+//        String line = "张三，里斯，wangmzi,peterchen,xxx";
+//        String[] court = pattern.split(line);
+//        for (String c : court) {
+//            System.out.println(c);
+//        }
+
+//        Pattern clean_pattern = Pattern.compile("[,，]");
+//        Matcher matcher = clean_pattern.matcher(line);
+//        String clean_line = matcher.replaceAll("");
+//        System.out.println(clean_line);
+
+        String line = "aaacabaxacasac";
+        Pattern clean_pattern = Pattern.compile("ac");
+        List<String> all_list = findAll(line, clean_pattern);
+        System.out.println(all_list);
+    }
+
+    public static List<String> findAll(String line, Pattern pattern) {
+        Matcher matcher = pattern.matcher(line);
+        List<String> all_list = new ArrayList<String>();
+        while(matcher.find()) {
+            all_list.add(matcher.group());
+        }
+        return all_list;
     }
 }
