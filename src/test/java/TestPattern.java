@@ -29,10 +29,15 @@ public class TestPattern {
 //        String clean_line = matcher.replaceAll("");
 //        System.out.println(clean_line);
 
-        String line = "aaacabaxacasac";
-        Pattern clean_pattern = Pattern.compile("ac");
-        List<String> all_list = findAll(line, clean_pattern);
-        System.out.println(all_list);
+        String line = "勾引门卫大爷一案中，小日本鬼子";
+        String pat = "|勾引|日本";
+//        Pattern pattern1 = Pattern.compile("(.*?)一案");
+        Pattern pattern = Pattern.compile("%s".format(pat.substring(1)));
+//        Pattern clean_pattern = Pattern.compile("%s".format(pat));
+//        List<String> all_list = findAll(line, clean_pattern);
+        String[] list = pattern.split(line);
+        System.out.println(list[1]);
+        System.out.println(pattern);
     }
 
     public static List<String> findAll(String line, Pattern pattern) {

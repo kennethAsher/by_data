@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * ClassName:      TestSymbols
  * Package:        PACKAGE_NAME
@@ -11,6 +14,8 @@ public class TestSymbols {
         String line = "";
         String[] fields = line.split("\\|");
         System.out.println(fields.length);
-
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("name","zhangsan");
+        System.out.println(map);
     }
 }
