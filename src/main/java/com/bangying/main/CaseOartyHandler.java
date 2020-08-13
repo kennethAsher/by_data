@@ -27,6 +27,9 @@ public class CaseOartyHandler {
         logger.info("开始执行清洗裁判文书，寻找内容原告，被告，案由");
         JavaSparkContext spark_context = SparkUtils.getSparkContext(Constant.getProperty("Case_party_appname"));
         JavaRDD<String> text_rdd = spark_context.textFile(Constant.getProperty("organ_data_path"));
-        JavaRDD<String> rdd_map = CaseParty.cleanCaseParty(text_rdd);
+        logger.info("开始清洗。。。");
+        JavaRDD<String> rdd_result = CaseParty.cleanCaseParty(text_rdd);
+        rdd_result.repartition(10);
+        rdd_result.saveAsTextFile(Constant.getProperty("case_party_path"));
     }
 }
