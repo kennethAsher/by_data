@@ -52,7 +52,7 @@ public class HdfsUtils {
         String line;
         while ((line = reader.readLine()) != null) {
             String[] fields = line.split("\\|");
-            if (fields.length<9){continue;}
+            if (fields.length<5){continue;}
             if (!fields[5].equals("")) {set_four.add(fields[5]);}
             if (!fields[4].equals("")) {set_three.add(fields[4]);}
             if (!fields[3].equals("")) {set_two.add(fields[3]);}
