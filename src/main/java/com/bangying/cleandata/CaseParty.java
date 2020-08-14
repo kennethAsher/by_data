@@ -1,7 +1,10 @@
 package com.bangying.cleandata;
 
+import com.bangying.utils.Constant;
 import com.bangying.utils.HdfsUtils;
 import com.bangying.utils.PatternUtils;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.Function;
@@ -9,7 +12,9 @@ import org.apache.spark.sql.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,12 +46,20 @@ public class CaseParty implements ForeachFunction<Row> {
     public static Pattern html_remove_pattern = Pattern.compile(">(.*?)<");
     // 移除括号内的内容
     public static Pattern constant_remove_pattern = Pattern.compile("[\\(（].*?[\\)）]");
+    // 正则匹配符合政府机构的名称
+    public static Pattern government_pat = Pattern.compile(".*(委|办公室|局|会|办|政协|部|政府|党校|部朝阳大街|信|中心|委银州区|厅|史馆|科学院|科院|事馆|处)$");
 
     //4个级别的案由
     public static Set<String> set_one = new HashSet<String>();
     public static Set<String> set_two = new HashSet<String>();
     public static Set<String> set_three = new HashSet<String>();
     public static Set<String> set_four = new HashSet<String>();
+
+    //百家姓和带标签企业的名单
+    public static Set<String> set_family_one = new HashSet<String>();
+    public static Set<String> set_family_two = new HashSet<String>();
+    public static Set<String> set_family_three = new HashSet<String>();
+    public static Set<String> set_label = new HashSet<String>();
 
     public CaseParty() {
     }
@@ -59,6 +72,10 @@ public class CaseParty implements ForeachFunction<Row> {
     //  开始清洗caseparty的主要运行函数
     public static JavaRDD<String> run(JavaRDD<String> rdd) throws IOException {
         addSet();
+//        System.out.println(set_family_one);
+//        System.out.println(set_family_two);
+//        System.out.println(set_family_three);
+//        System.out.println(set_label);
         JavaRDD<String> lines_rdd = rdd.map(new Function<String, String>() {
             @Override
             public String call(String line_mainbody) throws Exception {
@@ -117,6 +134,7 @@ public class CaseParty implements ForeachFunction<Row> {
                                     || name.contains("Ｘ") || name.contains("职工") || name.length() > 30) {
                                 continue;
                             }
+                            name = addType(name, set_family_one, set_family_two, set_family_three, set_label);
                             party_line = party_line + "," + party_type + "-" + name;
                         } catch (Exception e) {
                             return doc_id + "||";
@@ -133,7 +151,7 @@ public class CaseParty implements ForeachFunction<Row> {
                             if (cause_list.size() == 0 || lines[i].contains("姓名或名称")) {
                                 cause_name = "";
                             } else {
-                                cause_name = split_word_pattern.split(cause_list.get(0))[split_word_pattern.split(cause_list.get(0)).length-1].replace("一案","");
+                                cause_name = split_word_pattern.split(cause_list.get(0))[split_word_pattern.split(cause_list.get(0)).length - 1].replace("一案", "");
 
 //                                cause_name = (cause_name.startsWith("为") && cause_name.endsWith("纠纷")) ? cause_name.substring(1) : cause_name;
 //                                cause_name = (!cause_name.contains("��")) ? cleanCauseName(cause_name) : "";
@@ -150,8 +168,10 @@ public class CaseParty implements ForeachFunction<Row> {
                         return doc_id + "|" + cause_name + "|" + party_line;
                     }
                 }
-            if (party_line.length()<2) {return doc_id + "|" + cause_name + "|";}
-            return doc_id + "|" + cause_name + "|" + party_line;
+                if (party_line.length() < 2) {
+                    return doc_id + "|" + cause_name + "|";
+                }
+                return doc_id + "|" + cause_name + "|" + party_line;
             }
         });
 
@@ -170,6 +190,11 @@ public class CaseParty implements ForeachFunction<Row> {
         set_two = set_map.get("set_two");
         set_three = set_map.get("set_three");
         set_four = set_map.get("set_four");
+        Map<String, Set<String>> label_map = getFamiliesSet();
+        set_family_one = label_map.get("family_one");
+        set_family_two = label_map.get("family_two");
+        set_family_three = label_map.get("family_three");
+        set_label = label_map.get("label_set");
     }
 
     //    清洗案由名称
@@ -195,6 +220,76 @@ public class CaseParty implements ForeachFunction<Row> {
             }
         }
         return "";
+    }
+
+    //    为姓名添加分类
+    public static String addType(String name, Set<String> set_family_one, Set<String> set_family_two, Set<String> set_family_three, Set<String> set_label) {
+        if (name.length() < 2) {
+            return "";
+        }
+        String clean_name = cleanName(name);
+        Matcher matcher = government_pat.matcher(clean_name);
+        if (set_label.contains(clean_name)) {
+            return clean_name + "-有标签企业";
+        } else if (matcher.find()) {
+            return clean_name + "-政府";
+        } else if ((set_family_one.contains(clean_name.substring(0, 1)) || set_family_two.contains(clean_name.substring(0, 2))
+                || set_family_three.contains(clean_name.substring(0, 3))) && clean_name.length() <= 5) {
+            return clean_name + "-个人";
+        } else {
+            return clean_name + "-非上市民营";
+        }
+    }
+
+    //    清洗带括号的格式不清晰的name名称
+    public static String cleanName(String name) {
+        if (name.contains("（")) {
+            int start_index = name.indexOf("（");
+            if (name.contains("）")) {
+                int end_index = name.indexOf("）");
+                name = name.substring(start_index, end_index) + name.substring(end_index + 1);
+            } else {
+                name = name.substring(start_index);
+            }
+        }
+        return name;
+    }
+
+    //    获取百家姓和有标签企业名称信息
+    public static Map<String, Set<String>> getFamiliesSet() throws IOException {
+//        定义map返回内容
+        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
+//        定义set接收文件取出的内容
+        Set<String> family_one = new HashSet<String>();
+        Set<String> family_two = new HashSet<String>();
+        Set<String> family_three = new HashSet<String>();
+        Set<String> label_set = new HashSet<String>();
+//        读取文件位置
+        Path family_path = new Path(Constant.getProperty("family_file_path"));
+        Path label_path = new Path(Constant.getProperty("label_company_file_path"));
+//        开始读取文件
+        FileSystem fs = HdfsUtils.getFileSystem();
+        BufferedReader family_reader = new BufferedReader(new InputStreamReader(fs.open(family_path)));
+        BufferedReader label_reader = new BufferedReader(new InputStreamReader(fs.open(label_path)));
+//        循环按行读取文件
+        String line;
+        while ((line = family_reader.readLine()) != null) {
+            if (line.length() == 1) {
+                family_one.add(line);
+            } else if (line.length() == 2) {
+                family_two.add(line);
+            } else if (line.length() == 3) {
+                family_three.add(line);
+            }
+        }
+        map.put("family_one", family_one);
+        map.put("family_two", family_two);
+        map.put("family_three", family_three);
+        while ((line = label_reader.readLine()) != null) {
+            label_set.add(line);
+        }
+        map.put("label_set", label_set);
+        return map;
     }
 
     //    必须实现的方法，否则会报错
