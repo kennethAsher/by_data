@@ -17,7 +17,7 @@ import java.util.Map;
  * Datetime:       2020/7/30   11:28 上午
  * E-Mail:         1131771202@qq.com
  * Author:         KennethAsher
- * Description:    清洗裁判文书,将所有的裁判文书清洗统一放在这里执行
+ * Description:    清洗裁判文书,将所有的裁判文书清洗统一放在这里执行,最后需要合并的
  */
 public class Doc implements ForeachFunction<Row> {
     private final static Logger logger = LoggerFactory.getLogger(CaseParty.class);

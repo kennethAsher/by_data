@@ -17,7 +17,7 @@ import java.util.Map;
  * Datetime:       2020/7/30   10:29 上午
  * E-Mail:         1131771202@qq.com
  * Author:         KennethAsher
- * Description:    清洗裁判文书-启动，将所有需要清洗的内容放在此处统一开始执行
+ * Description:    清洗裁判文书-启动，将所有需要清洗的内容放在此处统一开始执行，最后合并的一键启动程序
  */
 public class DocHandler {
     private final static Logger logger = LoggerFactory.getLogger(DocHandler.class);
