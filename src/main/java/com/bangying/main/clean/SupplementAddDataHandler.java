@@ -1,4 +1,4 @@
-package com.bangying.main;
+package com.bangying.main.clean;
 
 /*
  * ClassName:       SupplementAddData

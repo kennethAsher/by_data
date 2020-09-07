@@ -1,0 +1,8 @@
+1.执行 SupplementAddData
+此方法是将add_data数据补充完整
+
+2.CasePartyHandler
+此方法是清洗裁判文书，从之中找到原告，被告以及案由等。（包括诉求方身份）
+
+3.LawyerJudgeHandler
+此方法是执行清洗律师审判人员的方法

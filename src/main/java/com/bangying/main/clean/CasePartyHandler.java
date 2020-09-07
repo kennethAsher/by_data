@@ -1,7 +1,6 @@
-package com.bangying.main;
+package com.bangying.main.clean;
 
 import com.bangying.cleandata.CaseParty;
-import com.bangying.cleandata.Doc;
 import com.bangying.utils.Constant;
 import com.bangying.utils.SparkUtils;
 import org.apache.spark.api.java.JavaRDD;
@@ -10,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * ClassName:      CasePartyHandler

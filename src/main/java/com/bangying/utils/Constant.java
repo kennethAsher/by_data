@@ -33,4 +33,16 @@ public class Constant {
     public static String getProperty(String key) throws IOException {
         return properties.getProperty(key);
     }
+    public static String[] delete(int index, String array[]) {
+        //数组的删除其实就是覆盖前一位
+        String[] arrNew = new String[array.length - 1];
+        for (int i = 0; i < array.length - 1; i++) {
+            if (i < index) {
+                arrNew[i] = array[i];
+            } else {
+                arrNew[i] = array[i + 1];
+            }
+        }
+        return arrNew;
+    }
 }

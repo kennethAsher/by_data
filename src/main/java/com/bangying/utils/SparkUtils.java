@@ -15,12 +15,19 @@ import org.apache.spark.api.java.JavaSparkContext;
 public class SparkUtils {
 
     public SparkUtils() {}
-//  获取sparkContext
+//  获取带有名称的sparkContext
     public static JavaSparkContext getSparkContext(String appName) {
         //初始化 JavaSparkContext
         SparkConf conf = new SparkConf().setAppName(appName);
         return new JavaSparkContext(conf);
     }
+//  获取带有名称的sparkContext
+    public static JavaSparkContext getSparkContext() {
+        //初始化 JavaSparkContext
+        SparkConf conf = new SparkConf();
+        return new JavaSparkContext(conf);
+    }
+
 //  获取lineRdd
     public static JavaRDD<String> getLineRdd(String path, JavaSparkContext sparkContext) {
         return sparkContext.textFile(path);
