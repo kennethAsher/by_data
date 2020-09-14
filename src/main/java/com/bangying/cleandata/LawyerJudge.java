@@ -10,10 +10,8 @@ package com.bangying.cleandata;
 
 import com.bangying.utils.Constant;
 import com.bangying.utils.PatternUtils;
-import com.bangying.utils.SparkUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LawyerJudge {
-    private final static Logger logger = LoggerFactory.getLogger(CaseParty.class);
+    private final static Logger logger = LoggerFactory.getLogger(Doc.CaseParty.class);
     public static Pattern lawyer_spc_word_clear_pat = Pattern.compile("(.*代理[人]?)|(.*辩护[人]?)|([\\(（].*?[\\)）])|(律师)$|^(代理)");
     public static Pattern lawyer_accuser_pat = Pattern.compile(".*委托诉?讼?(代理人|辩护人|代理|辩护)[人]?([\\(（].*[\\)）])?[:：]?(.*律师(事务所)?)");
     public static Pattern doc_split_pat = Pattern.compile("。");
