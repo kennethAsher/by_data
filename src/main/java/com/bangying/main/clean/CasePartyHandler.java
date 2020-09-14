@@ -1,6 +1,6 @@
 package com.bangying.main.clean;
 
-import com.bangying.cleandata.CaseParty;
+import com.bangying.cleandata.Doc;
 import com.bangying.utils.Constant;
 import com.bangying.utils.SparkUtils;
 import org.apache.spark.api.java.JavaRDD;
@@ -26,7 +26,7 @@ public class CasePartyHandler {
         JavaSparkContext spark_context = SparkUtils.getSparkContext(Constant.getProperty("Case_party_appname"));
         JavaRDD<String> text_rdd = spark_context.textFile(Constant.getProperty("organ_data_path"));
         logger.info("开始清洗。。。");
-        JavaRDD<String> rdd_result = CaseParty.cleanCaseParty(text_rdd);
+        JavaRDD<String> rdd_result = Doc.CaseParty.cleanCaseParty(text_rdd);
         rdd_result.repartition(100);
         rdd_result.saveAsTextFile(Constant.getProperty("case_party_path"));
     }
