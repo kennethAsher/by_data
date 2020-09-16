@@ -34,5 +34,6 @@ public class LawyerJudgeHandler {
         JavaRDD<String> result_rdd = LawyerJudge.cleanLawyerJudge(text_rdd);
         result_rdd.repartition(100);
         result_rdd.saveAsTextFile(Constant.getProperty("lawyer_judge_path"));
+        spark_context.stop();
     }
 }

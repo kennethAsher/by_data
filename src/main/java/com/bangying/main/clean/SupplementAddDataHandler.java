@@ -33,6 +33,7 @@ public class SupplementAddDataHandler {
         updated_rdd.repartition(100);
         updated_rdd.saveAsTextFile(Constant.getProperty("add_data_path"));
         SparkUtils.close(spark_context);
+        spark_context.stop();
     }
 
 

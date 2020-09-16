@@ -27,7 +27,8 @@ public class CasePartyHandler {
         JavaRDD<String> text_rdd = spark_context.textFile(Constant.getProperty("organ_data_path"));
         logger.info("开始清洗。。。");
         JavaRDD<String> rdd_result = Doc.CaseParty.cleanCaseParty(text_rdd);
-        rdd_result.repartition(100);
+        rdd_result.repartition(5);
         rdd_result.saveAsTextFile(Constant.getProperty("case_party_path"));
+        spark_context.stop();
     }
 }
