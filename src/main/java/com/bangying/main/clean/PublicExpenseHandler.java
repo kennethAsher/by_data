@@ -34,14 +34,17 @@ public class PublicExpenseHandler {
         JavaSparkContext spark_context = SparkUtils.getSparkContext(Constant.getProperty("public_expense_appname"));
 //        JavaRDD<String> text_rdd = spark_context.textFile(Constant.getProperty("organ_data_path"));
         int flag = 0;
+        JavaRDD<String> text_rdd;
+        JavaRDD<String> rdd_result;
         for (String name: nameList) {
             flag += 1;
-            JavaRDD<String> text_rdd = spark_context.textFile(Constant.getProperty("organ_data_path")+name);
+            text_rdd = spark_context.textFile(Constant.getProperty("organ_data_path")+name);
             logger.info("开始执行"+Constant.getProperty("organ_data_path")+name+",第"+flag+"个文件");
-            JavaRDD<String> rdd_result = PublicExpense.cleanPublicExpense(text_rdd);
+            rdd_result = PublicExpense.cleanPublicExpense(text_rdd);
             rdd_result.repartition(5);
             rdd_result.saveAsTextFile(Constant.getProperty("public_expense_path")+name);
         }
+        logger.info("清洗官费任务执行结束");
         spark_context.stop();
     }
 }
