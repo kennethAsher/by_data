@@ -31,20 +31,18 @@ public class PublicExpenseHandler {
         logger.info("开始执行清洗官费任务");
         FileSystem fileSystem = HdfsUtils.getFileSystem();
         List<String> nameList = HdfsUtils.catFileName(new Path(Constant.getProperty("organ_data_path")), fileSystem);
-        JavaSparkContext spark_context = SparkUtils.getSparkContext(Constant.getProperty("public_expense_appname"));
+//        JavaSparkContext spark_context = SparkUtils.getSparkContext(Constant.getProperty("public_expense_appname"));
 //        JavaRDD<String> text_rdd = spark_context.textFile(Constant.getProperty("organ_data_path"));
         int flag = 0;
-        JavaRDD<String> text_rdd;
-        JavaRDD<String> rdd_result;
         for (String name: nameList) {
+            JavaSparkContext spark_context = SparkUtils.getSparkContext(Constant.getProperty("public_expense_appname"));
             flag += 1;
-            text_rdd = spark_context.textFile(Constant.getProperty("organ_data_path")+name);
+            JavaRDD<String> text_rdd = spark_context.textFile(Constant.getProperty("organ_data_path")+name);
             logger.info("开始执行"+Constant.getProperty("organ_data_path")+name+",第"+flag+"个文件");
-            rdd_result = PublicExpense.cleanPublicExpense(text_rdd);
-            rdd_result.repartition(5);
+            JavaRDD<String> rdd_result = PublicExpense.cleanPublicExpense(text_rdd);
             rdd_result.saveAsTextFile(Constant.getProperty("public_expense_path")+name);
+            spark_context.stop();
         }
         logger.info("清洗官费任务执行结束");
-        spark_context.stop();
     }
 }
